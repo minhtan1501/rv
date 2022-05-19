@@ -7,12 +7,12 @@ function NotVerified() {
     const user = useSelector((state) => state.user)
     const nagative = useNavigate()
     const nagativeToVerification = () =>{
-      nagative('/auth/verification',{state:{user:user.user._id,replace:true}})
+      nagative('/auth/verification',{state:{user:user.profile._id,replace:true}})
     }
   
     return (
      <Container>
-       {user.isLogin && !user.user.isVerified ? 
+       {user.isLogin && !user.profile.isVerified ? 
        <p className="text-lg text-center bg-blue-50 p-2">
          It looks like you haven't verifed your account{" "}
          <button onClick={nagativeToVerification} className='text-blue-500 font-semibold hover:underline'>click here to verify your account.</button>

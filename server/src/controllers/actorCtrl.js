@@ -19,7 +19,7 @@ const actorCtrl = {
 
       await newActor.save();
 
-      res.status(200).json(formatActors(newActor));
+      res.status(200).json({actor:formatActors(newActor)});
     } catch (err) {}
   },
 
@@ -77,7 +77,7 @@ const actorCtrl = {
         $text: { $search: `"${query.name}"` },
       });
       const actors = result.map(item => formatActors(item));
-      res.json(actors);
+      res.json({results:actors});
     } catch (error) {}
   },
   getLatestActors: async (req, res, next) => {

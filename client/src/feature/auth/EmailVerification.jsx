@@ -30,7 +30,7 @@ function EmailVerification() {
   const navigate = useNavigate();
   // get state from singup
   const stateUser = state?.user;
-  const { isLogin, user } = useSelector((state) => state.user);
+  const { isLogin, profile } = useSelector((state) => state.user);
   // notification
   const { updateNotification } = useNotification();
   const focusNextInputField = (index) => {
@@ -63,8 +63,11 @@ function EmailVerification() {
     try {
       e.preventDefault();
       setLoadding(true)
-      if (!isValidOTP(otp)) return updateNotification('error', 'Invalid OTP');
-
+      if (!isValidOTP(otp)){
+        setLoadding(false)
+        return updateNotification('error', 'Invalid OTP');
+      } 
+      
       const res = await verifyEmail({
         OTP: otp.join(''),
         userId: stateUser,
@@ -106,8 +109,8 @@ function EmailVerification() {
   // check user
   React.useEffect(() => {
     if (!stateUser) navigate('/not-found');
-    if (isLogin && user?.isVerified) navigate('/');
-  }, [stateUser, navigate, isLogin,user.isVerified]);
+    if (isLogin && profile?.isVerified) navigate('/');
+  }, [stateUser, navigate, isLogin,profile.isVerified]);
 
   return (
     <FormContainer>

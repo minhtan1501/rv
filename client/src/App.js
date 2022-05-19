@@ -14,7 +14,7 @@ import Navbar from "./feature/user/Navbar";
 import { getUserInfo, refreshToken } from "./redux/userSlide";
 function App() {
   const user = useSelector(state => state.user);
-  const isAdmin = user.user?.role === 'admin'
+  const isAdmin = user.profile?.role === 'admin'
   const dispatch  = useDispatch()
   useEffect(()=>{
     const getInfo = async() =>{

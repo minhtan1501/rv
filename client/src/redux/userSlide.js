@@ -33,7 +33,7 @@ const userSlide = createSlice({
   name: 'user',
   initialState: {
     token: '',
-    user: {},
+    profile: {},
     isLogin: false,
   },
   reducers: {
@@ -44,21 +44,20 @@ const userSlide = createSlice({
   },
   extraReducers: {
     [userLogin.fulfilled]: (state, action) => {
-      console.log(action);
       localStorage.setItem('firstLogin', true);
       state.isLogin = true;
       state.token = action.payload?.accessToken;
     },
     [getUserInfo.fulfilled]: (state, action) => {
       state.isLogin = true 
-      state.user = action.payload.user;
+      state.profile = action.payload.user;
     },
     [refreshToken.fulfilled]: (state, action) => {
       state.token = action.payload;
     },
     [userLogout.fulfilled]: (state) => {
       state.isLogin = false;
-      state.user = {};
+      state.profile = {};
       state.token = "";
       localStorage.removeItem("firstLogin")
 

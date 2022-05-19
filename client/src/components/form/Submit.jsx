@@ -1,9 +1,10 @@
 import React from 'react';
 import {ImSpinner3} from 'react-icons/im'
-export default function Submit({ value,loadding }) {
+export default function Submit({ value,loadding ,type, onClick}) {
   return (
     <button
-      type="submit"
+      type={type || 'submit'}
+      onClick={onClick}
       className="p-1 
       bg-secondary 
       dark:text-secondary 

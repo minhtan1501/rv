@@ -3,7 +3,17 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { BsFillSunFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import themeSlice from '../../redux/themeSlice';
-function Header() {
+function Header({onAddMoviesClick,onAddActorsClick}) {
+  const options = [
+    {
+      title:"Add Movies",
+      onClick: onAddMoviesClick
+    },
+    {
+      title:"Add Actors",
+      onClick: onAddActorsClick
+    }
+]
   //toggle options
   const [showOption, setShowOption] = useState(false);
   // change theme
@@ -51,6 +61,7 @@ function Header() {
         <CreateOptions
           visible={showOption}
           onClose={() => setShowOption(false)}
+          options={options}
         />
       </div>
     </div>
@@ -59,7 +70,7 @@ function Header() {
 
 export default Header;
 
-function CreateOptions({ visible, onClose }) {
+function CreateOptions({ options,visible, onClose }) {
   const container = useRef();
   const containerId = 'option-container';
   useEffect(() => {
@@ -68,7 +79,7 @@ function CreateOptions({ visible, onClose }) {
       const { parentElement, id } = e.target;
 
       if (parentElement.id === containerId || id === containerId) return;
-      
+
       if (!container.current.classList.contains('animate-scale')) {
         container.current.classList.add('animate-scale-reverse');
       }
@@ -79,23 +90,32 @@ function CreateOptions({ visible, onClose }) {
     return () => {
       document.removeEventListener('click', handleClose);
     };
-
   }, [visible]);
+
+  const handleAnimationEnd = (e) => {
+    if (e.target.classList.contains('animate-scale-reverse')) onClose();
+    e.target.classList.remove('animate-scale');
+  };
+
+  const handleClick = (fn) =>{
+    fn()
+    onClose();
+    
+  }
 
   if (!visible) return null;
   return (
     <div
       ref={container}
       id={containerId}
+      
       className="absolute right-0 top-12 flex flex-col space-y-3 p-5
         dark:bg-secondary bg-white drop-shadow-lg animate-scale"
-      onAnimationEnd={(e) => {
-        if (e.target.classList.contains('animate-scale-reverse')) onClose();
-        e.target.classList.remove('animate-scale');
-      }}
+      onAnimationEnd={handleAnimationEnd}
     >
-      <Option>Add Movie</Option>
-      <Option>Add Actor</Option>
+      {options.map(({title,onClick},index)=>{
+        return (<Option key={index} onClick={()=>handleClick(onClick)}>{title}</Option>)
+      })}
     </div>
   );
 }
