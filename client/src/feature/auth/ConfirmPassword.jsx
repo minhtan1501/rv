@@ -4,9 +4,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { resetPassword, verifyPasswordResetToken } from '../../api/auth'
 import Container from '../../components/Container'
 import FormContainer from '../../components/form/FormContainer'
-import InputFiled from '../../components/form/InputFiled'
-import Submit from '../../components/form/Submit'
-import Title from '../../components/form/Title'
+import Submit from '../../components/Submit'
+import Title from '../../components/Title'
+import InputFiled from '../../components/formFiled/InputFiled'
 import { useNotification } from '../../hooks'
 import { commonModalClasses } from '../../utils/theme'
 function ConfirmPassword() {
@@ -16,7 +16,7 @@ function ConfirmPassword() {
   const [isVerifying, setIsVerifying] = useState(true);
   const [isValid, setIsValid] = useState(false);
   const {updateNotification} = useNotification()
-  const [loadding,setLoadding] = useState(false)
+  const [loading,setLoading] = useState(false)
   const [password,setPassword] = useState({
     passwordOne: '',
     passwordTwo: '',
@@ -36,15 +36,15 @@ function ConfirmPassword() {
 
       if(password.passwordOne.trim().length < 8) return updateNotification('error','Password must be 8 characters long!')
       if(password.passwordOne !== password.passwordTwo) return updateNotification('error',"Password do not match!")
-      setLoadding(true);
+      setLoading(true);
       const res = await resetPassword({newPassword:password.passwordOne,userId:id,token:token});
       updateNotification('success',res.message);
-      setLoadding(false);
+      setLoading(false);
       nagative('/auth/signin',{replace:true})
       
     }
     catch(err) {
-      setLoadding(false);
+      setLoading(false);
       updateNotification('error',err?.toString().replace("Error:",'').trim())
     }
 
@@ -122,7 +122,7 @@ function ConfirmPassword() {
           placeholder="Confirm Password"
           label="Confirm Password"
         />
-        <Submit value="Send Link" loadding={loadding}/>
+        <Submit value="Send Link" loading={loading}/>
 
       </form>
     </Container>

@@ -1,18 +1,14 @@
 import React from 'react';
-import {useDispatch} from 'react-redux';
-import { handleSearch } from '../../redux/searchSlice';
-import {debounce} from '../../utils/debounce'
+import AppInfoBox from '../../components/AppInfoBox';
+import LatestUploads from '../../components/LatestUploads';
 export default function Dashboard() {
-  const dispatch = useDispatch();
-  const debounceSearch = debounce(dispatch,500)
-
-  const handleChange = ({target}) =>{
-    debounceSearch(handleSearch(target.value))
-  }
-
   return (
-    <div className="p-14">
-      <input onChange={handleChange} type="text" className="border border-gray-500 " />
+    <div className="grid grid-cols-3 gap-5 my-5">
+      <AppInfoBox title="Total Uploads" subTitle="100" />
+      <AppInfoBox title="Total Reviews" subTitle="100" />
+      <AppInfoBox title="Total Users" subTitle="100" />
+
+      <LatestUploads/>
     </div>
-  )
+  );
 }

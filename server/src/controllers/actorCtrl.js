@@ -19,7 +19,7 @@ const actorCtrl = {
 
       await newActor.save();
 
-      res.status(200).json({actor:formatActors(newActor)});
+      res.status(200).json({ actor: formatActors(newActor) });
     } catch (err) {}
   },
 
@@ -47,8 +47,13 @@ const actorCtrl = {
         const { url, public_id } = await uploadImageToCloud(file.path);
         actor.avatar = { url, public_id };
       }
+
+      actor.name = name;
+      actor.about = about;
+      actor.gender = gender;
+
       await actor.save();
-      res.status(200).json(formatActors(actor));
+      res.status(200).json({ actor: formatActors(actor) });
     } catch (error) {}
   },
   delete: async (req, res, next) => {
@@ -72,18 +77,23 @@ const actorCtrl = {
   },
   search: async (req, res, next) => {
     try {
-      const { query } = req;
+      const { name } = req.query;
+      // const result = await Actor.find({
+      //   $text: { $search: `"${query.name}"` },
+      // });
+
+      if(!name.trim()) return sendError(res, "Invalid Request")
       const result = await Actor.find({
-        $text: { $search: `"${query.name}"` },
+        name: { $regex: name, $options: "i" },
       });
-      const actors = result.map(item => formatActors(item));
-      res.json({results:actors});
+      const actors = result.map((item) => formatActors(item));
+      res.json({ results: actors });
     } catch (error) {}
   },
   getLatestActors: async (req, res, next) => {
     try {
       const result = await Actor.find().sort({ createdAt: "-1" }).limit(12);
-      const actors = result.map(item => formatActors(item));
+      const actors = result.map((item) => formatActors(item));
       res.json(actors);
     } catch (error) {}
   },
@@ -97,6 +107,19 @@ const actorCtrl = {
 
       res.status(200).json(formatActors(result));
     } catch (error) {}
+  },
+  getActors: async (req, res, next) => {
+    try {
+      const { pageNo, limit } = req.query;
+      const actors = await Actor.find({})
+        .sort({ createdAt: -1 })
+        .skip(parseInt(pageNo) * parseInt(limit))
+        .limit(parseInt(limit));
+
+      const profile = actors?.map((a) => formatActors(a));
+
+      res.status(200).json({ profile });
+    } catch (err) {}
   },
 };
 

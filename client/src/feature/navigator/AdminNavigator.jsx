@@ -33,7 +33,7 @@ function AdminNavigator() {
     <>
       <div className="flex dark:bg-primary bg-white">
         <NavbarAdmin />
-        <div className="flex-1 p-2 max-w-screen-xl">
+        <div className="flex-1  max-w-screen-xl">
           <Header
             onAddMoviesClick={displayModalUploadMovie}
             onAddActorsClick={displayModalUploadActor}

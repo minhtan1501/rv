@@ -35,7 +35,13 @@ axiosClient.interceptors.response.use(
       '/user/login',
       '/user/verify-email',
       '/movie/upload-trailer',
-      '/actor/create'
+      '/actor/create',
+      '/movie/create',
+      '/actor/actors',
+      '/movie/movies',
+      '/actor/:id',
+      '/movie/for-update/:id'
+
     ];
     if (URLS.includes(config.url) && status === 400) {
       console.log(data?.error);

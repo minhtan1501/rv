@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ModalContainer from './ModalContainer';
 import genres from '../../utils/genres';
-import Submit from '../form/Submit';
+import Submit from '../Submit';
 export default function GenresModal({ visible, onClose, onSubmit, previousSelection}) {
   let [selectedGenres, setSelectedGenres] = useState([]);
 

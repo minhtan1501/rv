@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import Container from '../../components/Container';
 import CustomLink from '../../components/CustomLink';
 import FormContainer from '../../components/form/FormContainer';
-import InputFiled from '../../components/form/InputFiled';
-import Submit from '../../components/form/Submit';
-import Title from '../../components/form/Title';
+import Submit from '../../components/Submit';
+import Title from '../../components/Title';
+import InputFiled from '../../components/formFiled/InputFiled';
 import { useNotification } from '../../hooks';
 import { userLogin } from '../../redux/userSlide';
 import { isValidEmail } from '../../utils/helper';
@@ -32,7 +32,7 @@ const validateUserInfo = ({ email, password }) => {
 function Singin() {
   const dispatch = useDispatch();
   const { updateNotification } = useNotification();
-  const [loadding, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: '',
@@ -88,7 +88,7 @@ function Singin() {
             value={userInfo.password}
             onChange={handleChangeUserInfo}
           />
-          <Submit value="Sign in" loadding={loadding} />
+          <Submit value="Sign in" loading={loading} />
           <div className="flex justify-between">
             <CustomLink to="/auth/forget-password">Forget password</CustomLink>
             <CustomLink to="/auth/signup">Sign up</CustomLink>

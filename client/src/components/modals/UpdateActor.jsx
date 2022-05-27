@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { updateActor } from '../../api/actor';
+import { useNotification } from '../../hooks';
+import { getToken } from '../../redux/selector';
 import ActorForm from '../form/ActorForm';
 import ModalContainer from './ModalContainer';
-import { createActor } from '../../api/actor';
-import { useNotification } from '../../hooks';
-import {getToken } from '../../redux/selector'
-export default function ActorUpload({ visible, onClose }) {
+export default function UpdateActor({
+  visible,
+  initialState,
+  onSuccess,
+  onClose,
+}) {
   const { updateNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const token = useSelector(getToken);
   const handleSubmitActor = async (data) => {
     try {
       setLoading(true);
-      const { actor } = await createActor(data, token);
-      updateNotification('success', 'Actor created successfully');
+      const { actor } = await updateActor(data, initialState.id, token);
+      updateNotification('success', 'Actor updated successfully');
       onClose();
       setLoading(false);
+      onSuccess(actor);
     } catch (error) {
       updateNotification('error', error.message || error);
       onClose();
@@ -27,8 +33,9 @@ export default function ActorUpload({ visible, onClose }) {
       <ActorForm
         loading={loading}
         onSubmit={handleSubmitActor}
-        title="Create new Actor"
-        btnTitle="Create"
+        title="Update Actor"
+        btnTitle="Update"
+        initialState={initialState}
       />
     </ModalContainer>
   );

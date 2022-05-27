@@ -1,55 +1,29 @@
 import React, { useState } from 'react';
-import { useNotification } from '../../hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { searchActor } from '../../api/actor';
+import LiveSearch from '../../feature/user/LiveSearch';
+import { useNotification, useSearch } from '../../hooks';
+import searchSlice from '../../redux/searchSlice';
+import { getToken } from '../../redux/selector';
+import { renderItem } from '../../utils/helper';
 import { commonInputClass } from '../../utils/theme';
-import LiveSearch from '../user/LiveSearch';
 
 const defaultCastInfo = {
   profile: {},
   roleAs: '',
   leadActor: false,
 };
-const results = [
-  {
-    name: 'Tan',
-    avatar:
-      'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-    id: 1,
-  },
-  {
-    name: 'Tannn',
-    avatar:
-      'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-    id: 2,
-  },
-  {
-    name: 'Tannnnn',
-    avatar:
-      'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-    id: 3,
-  },
-  {
-    name: 'Tannnnnn',
-    avatar:
-      'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-    id: 4,
-  },
-];
-const renderItem = (result) => {
-  return (
-    <div className="flex space-x-2 rounded overflow-hidden">
-      <img
-        className="w-16 h-16 object-cover"
-        src={result.avatar}
-        alt={result.name}
-      />
-      <p className="dark:text-white font-semibold">{result.name}</p>
-    </div>
-  );
-};
+
 export default function CastForm({ onSubmit }) {
   const [castInfo, setCastInfo] = useState({ ...defaultCastInfo });
   const { leadActor, profile, roleAs } = castInfo;
+  const [profiles, setProfiles] = useState([]);
+
   const { updateNotification } = useNotification();
+  const dispatch = useDispatch();
+  const token = useSelector(getToken);
+  const debounceSearch = useSearch();
+
   const handleOnChange = ({ target }) => {
     const { checked, name, value } = target;
     if (name === 'leadActor')
@@ -68,7 +42,22 @@ export default function CastForm({ onSubmit }) {
       return updateNotification('error', 'Cast role is missing!');
     if (!onSubmit) return;
     onSubmit(castInfo);
-    setCastInfo({ ...defaultCastInfo });
+    setCastInfo({ ...defaultCastInfo, profile: { name: '' } });
+    dispatch(searchSlice.actions.resetSearch());
+    setProfiles([]);
+  };
+
+  const handleProfileChange = ({ target }) => {
+    const { value } = target;
+    const { profile } = castInfo;
+    profile.name = value;
+    setCastInfo({ ...castInfo, ...profile });
+    debounceSearch({
+      query: value,
+      token,
+      search: searchActor,
+      updaterFuc: setProfiles,
+    });
   };
 
   return (
@@ -85,12 +74,11 @@ export default function CastForm({ onSubmit }) {
         placeholder="Search profile"
         value={profile.name}
         checked={leadActor}
-        results={results}
+        results={profiles}
         renderItem={renderItem}
         onSelect={handleProfileSelect}
         name="profile"
-        onChange={handleOnChange}
-       
+        onChange={handleProfileChange}
       />
       <span
         className="

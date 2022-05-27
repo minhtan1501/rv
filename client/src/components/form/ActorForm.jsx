@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImSpinner3 } from 'react-icons/im';
 import { useNotification } from '../../hooks';
 import { genderOptions } from '../../utils/options';
 import { commonInputClass } from '../../utils/theme';
+import Selector from '../formFiled/Selector';
 import PosterSelector from '../poster/PosterSelector';
-import Selector from './Selector';
 
 const defaultActorInfo = {
   name: '',
@@ -22,13 +22,19 @@ const validateActor = ({ name, about, avatar, gender }) => {
   return { error: null };
 };
 
-export default function ActorForm({ title, btnTitle, onSubmit, loadding }) {
+export default function ActorForm({
+  title,
+  btnTitle,
+  onSubmit,
+  initialState,
+  loading,
+}) {
   const [actorInfo, setActorInfo] = useState({ ...defaultActorInfo });
   const [selectedAvatarForUI, setSelectedAvatarForUI] = useState('');
   const { updateNotification } = useNotification();
 
   const handleUpdateAvatar = (file) => {
-    if (!file.type?.startsWith('image')) {
+    if (!file?.type?.startsWith('image') && file) {
       updateNotification('error', 'Support only image!');
     }
     const url = URL.createObjectURL(file);
@@ -60,6 +66,13 @@ export default function ActorForm({ title, btnTitle, onSubmit, loadding }) {
     if (onSubmit) onSubmit(formData);
   };
 
+  useEffect(() => {
+    if(initialState){
+      setActorInfo({...initialState, avatar:null})
+      setSelectedAvatarForUI(initialState.avatar)
+    }
+  },[initialState])
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -76,9 +89,9 @@ export default function ActorForm({ title, btnTitle, onSubmit, loadding }) {
             hover:opacity-80 transition rounded
             flex justify-center items-center
             "
-            disabled={loadding}
+          disabled={loading}
         >
-          {loadding? <ImSpinner3 className="animate-spin"/>:btnTitle}
+          {loading ? <ImSpinner3 className="animate-spin" /> : btnTitle}
         </button>
       </div>
       <div className="flex space-x-2">

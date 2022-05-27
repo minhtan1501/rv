@@ -1,5 +1,5 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import NotFound from "./components/NotFound";
@@ -15,6 +15,7 @@ import { getUserInfo, refreshToken } from "./redux/userSlide";
 function App() {
   const user = useSelector(state => state.user);
   const isAdmin = user.profile?.role === 'admin'
+  const timeoutId = useRef();
   const dispatch  = useDispatch()
   useEffect(()=>{
     const getInfo = async() =>{
@@ -42,10 +43,13 @@ function App() {
       }
     }
     refresh()
-    setTimeout(()=>{
+    timeoutId.current =  setTimeout(()=>{
       refresh()
     },10*60*1000)
-  },[user.login])
+
+    return ()=> clearTimeout(timeoutId)
+
+  },[user.login,dispatch])
 
   if(isAdmin){
     return (

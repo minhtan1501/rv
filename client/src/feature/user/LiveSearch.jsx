@@ -12,12 +12,12 @@ export default function LiveSearch({
   onSelect = null,
   inputStyle,
   name,
-  visible
+  visible,
 }) {
   const [displaySearch, setDisplaySearch] = useState(false);
   const [focusIndex, setFocusIndex] = useState(-1);
   const handleFocus = (e) => {
-      if (results.length) setDisplaySearch(true);
+    if (results.length) setDisplaySearch(true);
   };
 
   const closeSearch = () => {
@@ -32,10 +32,10 @@ export default function LiveSearch({
   };
 
   const handleSelection = (selectedItem) => {
-    if(selectedItem){
+    if (selectedItem) {
       onSelect(selectedItem);
       closeSearch();
-    } 
+    }
   };
 
   const handleKeyDown = ({ key }) => {
@@ -51,7 +51,7 @@ export default function LiveSearch({
       nextCount = (nextCount + results.length - 1) % results.length;
     }
     if (key === 'Enter') return handleSelection(results[focusIndex]);
-    if (key === 'Escape') return closeSearch()
+    if (key === 'Escape') return closeSearch();
     setFocusIndex(nextCount);
   };
 
@@ -61,16 +61,16 @@ export default function LiveSearch({
       : `${commonInputClass} border-2 p-1 rounded text-lg`;
   };
 
-useEffect(() => {
-  if(visible) return setDisplaySearch(visible)
-  setDisplaySearch(false);
-},[visible])
+  useEffect(() => {
+    if (results.length) return setDisplaySearch(true);
+    setDisplaySearch(false);
+  }, [results.length]);
 
   return (
     <div className="relative">
       <input
         onKeyDown={handleKeyDown}
-        onFocus={(e)=>handleFocus(e)}
+        onFocus={(e) => handleFocus(e)}
         onBlur={handleBlur}
         placeholder={placeholder}
         value={value}

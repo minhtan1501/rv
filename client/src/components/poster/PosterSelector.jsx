@@ -23,6 +23,7 @@ export default function PosterSelector({
         id={name}
         type="file"
         hidden
+        multiple
       />
       <label htmlFor={name}>
         {selectedPoster ? (

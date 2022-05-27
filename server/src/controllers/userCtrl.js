@@ -209,7 +209,7 @@ const userCrtl = {
       await newPasswordRestToken.save();
       const resetPasswordUrl = `http://localhost:3000/auth/reset-password?token=${token}&id=${user._id}`;
       transport.sendMail({
-        from: "sercurity@t&t.com",
+        from: "security@t&t.com",
         to: user.email,
         subject: "Reset Password Link",
         html: `
@@ -274,7 +274,7 @@ const createRefreshToken = (user) => {
 const createAccessToken = (user) => {
   console.log(process.env.ACCESS_TOKEN_SECRET);
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "11m",
+    expiresIn: "12m",
   });
 };
 

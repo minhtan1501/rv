@@ -8,7 +8,7 @@ export default function ModalContainer({
 }) {
   const handleClick = (e) => {
     if (!onClose) return;
-    if (e.target.id === 'modal-container') onClose();
+    if (e.target.id === 'modal-container') onClose && onClose();
   };
   const renderChildren =() => {
     if(ignoreContainer) return children

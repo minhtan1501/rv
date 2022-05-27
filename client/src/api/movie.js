@@ -11,3 +11,28 @@ export const uploadTrailer = (formData, token, onUploadProgress) => {
     },
   });
 };
+export const uploadMovie = (formData, token) => {
+  const url = '/movie/create';
+  return axiosClient.post(url, formData, {
+    headers: { Authorization: token, 'content-type': 'multipart/form-data' },
+    withCredentials: true,
+  });
+};
+
+
+
+export const getMovies = async (pageNo,limit,token) =>{
+  const url = `/movie/movies?pageNo=${pageNo}&limit=${limit}`;
+  return axiosClient.get(url,{
+    withCredentials: true,
+    headers: { Authorization: token}
+  })
+}
+
+export const getMovieForUpdate = async (id,token) =>{
+  const url = `/movie/for-update/${id}`;
+  return axiosClient.get(url,{
+    withCredentials: true,
+    headers: { Authorization: token}
+  })
+}

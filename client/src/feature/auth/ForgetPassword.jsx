@@ -3,9 +3,9 @@ import { forgetPassword } from '../../api/auth'
 import Container from '../../components/Container'
 import CustomLink from '../../components/CustomLink'
 import FormContainer from '../../components/form/FormContainer'
-import InputFiled from '../../components/form/InputFiled'
-import Submit from '../../components/form/Submit'
-import Title from '../../components/form/Title'
+import Submit from '../../components/Submit'
+import Title from '../../components/Title'
+import InputFiled from '../../components/formFiled/InputFiled'
 import { useNotification } from '../../hooks'
 import { isValidEmail } from '../../utils/helper'
 import { commonModalClasses } from '../../utils/theme'
@@ -13,23 +13,23 @@ import { commonModalClasses } from '../../utils/theme'
 function ForgetPassword() {
   const [value,setValue] = useState('');
   const {updateNotification} = useNotification()
-  const [loadding,setLoadding] = useState(false)
+  const [loading,setLoading] = useState(false)
   const handleOnChange = (e) => {
     setValue(e.target.value)
   }
   const handleOnSubmit = async (e) => {
     try {
       e.preventDefault()
-      setLoadding(true)
+      setLoading(true)
       if(!isValidEmail(value)) return updateNotification('error','Invalid Email') 
       const res =   await forgetPassword({email:value});
       console.log(res)
        updateNotification('success',res.message)
        setValue('')
-       setLoadding(false)
+       setLoading(false)
     }
     catch (err) {
-      setLoadding(false)
+      setLoading(false)
       updateNotification('error',err?.data?.error)
     }
     
@@ -48,7 +48,7 @@ function ForgetPassword() {
           value={value}
           onChange={handleOnChange}
         />
-        <Submit value="Send Link" loadding={loadding}/>
+        <Submit value="Send Link" loading={loading}/>
         <div className="flex justify-between">
           <CustomLink to='/auth/forget-password'>Forget password</CustomLink>
           <CustomLink to='/auth/signin'>Sign in</CustomLink>     

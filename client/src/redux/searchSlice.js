@@ -1,14 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { searchActor } from '../api/actor';
 
 export const handleSearch = createAsyncThunk(
   'search/handleSearch',
-  async ({query,token,updaterFuc}, { rejectWithValue }) => {
+  async ({ query, token, search, updaterFuc }, { rejectWithValue }) => {
     if (!query.trim()) {
       return rejectWithValue();
     }
-    const {results} = await searchActor(query, token)
-    return {results,updaterFuc}
+    if (!search) rejectWithValue();
+    const { results } = await search(query, token);
+    return { results, updaterFuc };
   }
 );
 
@@ -17,28 +17,33 @@ const searchSlice = createSlice({
   initialState: {
     searching: false,
     results: [],
-    resultNotFound: false
+    resultNotFound: false,
   },
-  reducers:{
-    resetSearch(state){
+  reducers: {
+    resetSearch(state) {
       state.searching = false;
       state.results = [];
       state.resultNotFound = false;
-    }
+    },
   },
   extraReducers: {
     [handleSearch.pending]: (state, action) => {
       state.searching = true;
     },
     [handleSearch.fulfilled]: (state, action) => {
-      const {results,updaterFuc} = action.payload
+      const { results, updaterFuc } = action.payload;
       state.searching = false;
-      if(!action?.payload?.length){
+      if (!results?.length) {
         state.resultNotFound = true;
+        state.results = [];
+        updaterFuc && updaterFuc([]);
       } 
-      updaterFuc([...results])
-      state.results = results || []
-      
+      else{
+        updaterFuc && updaterFuc([...results]);
+        state.results = results;
+        state.resultNotFound = false;
+
+      }
     },
     [handleSearch.rejected]: (state, action) => {
       state.searching = false;

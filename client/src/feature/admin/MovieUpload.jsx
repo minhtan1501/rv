@@ -2,60 +2,42 @@ import { useEffect, useState } from 'react';
 import { FileUploader } from 'react-drag-drop-files';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
-import { uploadTrailer } from '../../api/movie';
+import { uploadMovie, uploadTrailer } from '../../api/movie';
+import MovieForm from '../../components/form/MovieForm';
 import ModalContainer from '../../components/modals/ModalContainer';
 import { useNotification } from '../../hooks/index';
 import { getToken } from '../../redux/selector';
-import MovieForm from './MovieForm';
-function MovieUpload({visible, onClose}) {
+function MovieUpload({ visible, onClose }) {
   const { updateNotification } = useNotification();
   const [videoSelected, setVideoSelected] = useState(false);
   const [videoUploader, setVideoUploader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [videoInfo, setVideoInfo] = useState({});
-  const [movieInfo, setMovieInfo] = useState({
-    title: '',
-    storyLine: '',
-    tags: [],
-    cast: [],
-    director: {},
-    writers: [],
-    releseDate: '',
-    poster: null,
-    genres: [],
-    type: '',
-    language: '',
-    status: '',
-    trailer: {
-      url: '',
-      public_id: '',
-    },
-  });
+  const [loadding, setLoadding] = useState(false);
   const token = useSelector(getToken);
-  
+
   const handleTypeError = (e) => {
     updateNotification('error', e);
   };
- 
+
   const handleUploadTrailer = async (data) => {
     try {
-      const result = await uploadTrailer(data,token, setUploadProgress);
+      const result = await uploadTrailer(data, token, setUploadProgress);
       if (result) {
         setVideoUploader(true);
       }
       const { url, public_id } = result;
-      setVideoInfo(url, public_id);
+      setVideoInfo({ url, public_id });
     } catch (error) {
       updateNotification('error', error);
     }
   };
- 
+
   const handleChange = (file) => {
     const formData = new FormData();
     formData.append('video', file);
     setVideoSelected(true);
     handleUploadTrailer(formData);
- 
   };
   const getUploadProgressValue = () => {
     if (!videoUploader && uploadProgress >= 100) {
@@ -64,26 +46,49 @@ function MovieUpload({visible, onClose}) {
     return `Upload progress ${uploadProgress}`;
   };
 
-  
-  useEffect(() => {
-    window.scroll(0,0)
-  },[visible])
+  const handleSubmit = async (data) => {
+    try {
+      if (!videoInfo.url && !videoInfo.public_id)
+        return updateNotification('error', 'Trailer is missing!');
+      data.append('trailer', JSON.stringify(videoInfo));
+      setLoadding(true);
+      const res = await uploadMovie(data, token);
+      console.log(res);
+      setLoadding(false);
+      onClose();
+    } catch (error) {
+      setLoadding(false);
+      console.log(error);
+    }
+  };
 
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, [visible]);
 
   return (
-   <ModalContainer visible={visible} onClose={onClose}>
-     {/* <UpLoadProgress
-       visible={!videoUploader && videoSelected}
-       message={getUploadProgressValue()}
-       width={uploadProgress}
-     />
-     <TrailerSelector
-       visible={!videoSelected}
-       onTypeError={handleTypeError}
-       handleChange={handleChange}
-     /> */}
-     <MovieForm/>
-   </ModalContainer>
+    <ModalContainer visible={visible}>
+      <div className="mb-5">
+        <UpLoadProgress
+          visible={!videoUploader && videoSelected}
+          message={getUploadProgressValue()}
+          width={uploadProgress}
+        />
+      </div>
+      {!videoSelected ? (
+        <TrailerSelector
+          visible={!videoSelected}
+          onTypeError={handleTypeError}
+          handleChange={handleChange}
+        />
+      ) : (
+        videoUploader &&
+        <MovieForm
+          loadding={loadding}
+          onSubmit={!loadding ? handleSubmit : null}
+        />
+      )}
+    </ModalContainer>
   );
 }
 
@@ -91,6 +96,11 @@ export default MovieUpload;
 
 const TrailerSelector = ({ visible, handleChange, onTypeError }) => {
   if (!visible) return null;
+  
+  const handleClick = (e) => {
+    e.preventDefault();
+  }
+
   return (
     <div className="h-full flex items-center justify-center">
       <FileUploader
@@ -103,6 +113,7 @@ const TrailerSelector = ({ visible, handleChange, onTypeError }) => {
             dark:border-dark-subtle border-light-subtle
             rounded-full flex items-center justify-center flex-col
             dark:text-dark-subtle text-secondary cursor-pointer"
+          onClick={handleClick}
         >
           <AiOutlineCloudUpload size={80} />
           <p>Drop your file here!</p>

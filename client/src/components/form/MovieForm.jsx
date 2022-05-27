@@ -1,51 +1,26 @@
-import React, { useState } from 'react';
-import Selector from '../../components/form/Selector';
-import Submit from '../../components/form/Submit';
-import TagsInput from '../../components/form/TagsInput';
-import CastModal from '../../components/modals/CastModal';
-import GenresModal from '../../components/modals/GenresModal';
-import WritersModal from '../../components/modals/WritersModal';
-import PosterSelector from '../../components/poster/PosterSelector';
+import React, { useEffect, useState } from 'react';
 import { useNotification } from '../../hooks';
 import {
   languageOptions,
   statusOptions,
-  typeOptions,
+  typeOptions
 } from '../../utils/options';
 import { commonInputClass } from '../../utils/theme';
-import GenresSelector from '../user/GenresSelector';
-import LiveSearch from '../user/LiveSearch';
+import { validateMovie } from '../../utils/validator';
+import DirectorSelector from '../formFiled/DirectorSelector';
+import GenresSelector from '../formFiled/GenresSelector';
+import Selector from '../formFiled/Selector';
+import TagsInput from '../formFiled/TagsInput';
+import WriterSelector from '../formFiled/WriterSelector';
+import Label from '../Label';
+import LabelWithBadge from '../LabelWithBadge';
+import CastModal from '../modals/CastModal';
+import GenresModal from '../modals/GenresModal';
+import WritersModal from '../modals/WritersModal';
+import PosterSelector from '../poster/PosterSelector';
+import Submit from '../Submit';
+import ViewAllBtn from '../ViewAllButton';
 import CastForm from './CastForm';
-import { useDispatch, useSelector } from 'react-redux';
-import { debounce } from '../../utils/debounce';
-import { getToken } from '../../redux/selector';
-import searchSlice, { handleSearch } from '../../redux/searchSlice';
-// const results = [
-//   {
-//     name: 'Tan',
-//     avatar:
-//       'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-//     id: 1,
-//   },
-//   {
-//     name: 'Tannn',
-//     avatar:
-//       'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-//     id: 2,
-//   },
-//   {
-//     name: 'Tannnnn',
-//     avatar:
-//       'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-//     id: 3,
-//   },
-//   {
-//     name: 'Tannnnnn',
-//     avatar:
-//       'https://res.cloudinary.com/dtvwgsmrq/image/upload/v1651746615/baocao/obpd9zdoq6ctn4gep8kz.jpg',
-//     id: 4,
-//   },
-// ];
 
 const defaultMovieInfo = {
   title: '',
@@ -62,60 +37,90 @@ const defaultMovieInfo = {
   status: '',
 };
 
-export default function MovieForm() {
+export default function MovieForm({ onSubmit, loading,initialState }) {
   const [movieInfo, setMovieInfo] = useState({ ...defaultMovieInfo });
   const [showWritersModal, setShowWritersModal] = useState(false);
   const [showCastModal, setShowCastModal] = useState(false);
   const [selectedPosterUI, setSelectedPosterUI] = useState('');
   const [showGenresModal, setShowGenresModal] = useState(false);
-  const dispatch = useDispatch();
-  const debounceSearch = debounce(dispatch, 500);
-  const token = useSelector(getToken);
-  const [writerName,setWriterName] = useState('')
   const { updateNotification } = useNotification();
-  const { searching, results } = useSelector((state) => state.search);
-  const [writerPoster,setWriterPoster] = useState([])
-  const [directorPoster,setDirectorPoster] = useState([])
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(movieInfo);
-  };
-  const renderItem = (result) => {
-    return (
-      <div className="flex space-x-2 rounded overflow-hidden">
-        <img
-          className="w-16 h-16 object-cover"
-          src={result.avatar}
-          alt={result.name}
-        />
-        <p className="dark:text-white font-semibold">{result.name}</p>
-      </div>
-    );
+
+    const { error } = validateMovie(movieInfo);
+    if (error) return updateNotification('error', error);
+
+    //cast, tags, genres, writers
+    const { tags, genres, cast, writers, director, poster } = movieInfo;
+
+    const formData = new FormData();
+    const finalMovieInfo = {
+      ...movieInfo,
+    };
+
+    finalMovieInfo.tags = JSON.stringify(tags);
+    finalMovieInfo.genres = JSON.stringify(genres);
+
+    const finalCast = cast.map((c) => {
+      return {
+        actor: c.profile.id,
+        roleAs: c.roleAs,
+        leadActor: c.leadActor,
+      };
+    });
+    finalMovieInfo.cast = JSON.stringify(finalCast);
+
+    if (writers.length) {
+      const finalWriters = writers.map((w) => w.id);
+      finalMovieInfo.writers = JSON.stringify(finalWriters);
+    }
+
+    if (director.id) {
+      finalMovieInfo.director = director.id;
+    }
+
+    if (poster) finalMovieInfo.poster = poster;
+
+    for (let key in finalMovieInfo) {
+      formData.append(key, finalMovieInfo[key]);
+    }
+
+    onSubmit(formData);
   };
 
   const updatePosterForUi = (file) => {
     const img = ['image/jpg', 'image/png', 'image/jpeg'];
-    if (!img.includes(file?.type))
+    if (!img.includes(file?.type) && file)
       return updateNotification('error', 'Supported only image files');
     const url = URL.createObjectURL(file);
     setSelectedPosterUI(url);
   };
 
-  
+  useEffect(() => {
+    if(initialState) {
+      setMovieInfo({
+        ...initialState,
+        releseDate:initialState.releseDate.split("T")[0],
+        poster:null});
+      setSelectedPosterUI(initialState.poster);
+    }
+    console.log(initialState)
+  },[initialState])
+
   const {
     title,
     storyLine,
-    director,
     writers,
     cast,
     tags,
     genres,
     status,
-    laguage,
+    language,
     type,
+    releseDate
   } = movieInfo;
-
+  console.log(movieInfo)
   const handleChange = ({ target }) => {
     const { value, name, files } = target;
     if (name === 'poster') {
@@ -123,7 +128,6 @@ export default function MovieForm() {
       updatePosterForUi(poster);
       return setMovieInfo({ ...movieInfo, poster });
     }
-    if(name === 'writers') return setWriterName(value)
     setMovieInfo({ ...movieInfo, [name]: value });
   };
 
@@ -131,12 +135,11 @@ export default function MovieForm() {
     setMovieInfo({ ...movieInfo, tags: [...tags] });
   };
 
-  const updateDiretor = (director) => {
+  const updateDirector = (director) => {
     setMovieInfo({ ...movieInfo, director });
-    dispatch(searchSlice.actions.resetSearch())
   };
 
-  const updateWriters = (profile) => {
+  const updateWriter = (profile) => {
     const { writers } = movieInfo;
     for (let writer of writers) {
       if (writer.id === profile.id) {
@@ -148,11 +151,11 @@ export default function MovieForm() {
     }
     setMovieInfo({ ...movieInfo, writers: [...writers, profile] });
   };
-  
+
   const hideWritersModal = () => {
     setShowWritersModal(false);
   };
-  
+
   const displayWritersModal = () => {
     setShowWritersModal(true);
   };
@@ -165,11 +168,9 @@ export default function MovieForm() {
     setShowGenresModal(false);
   };
 
-
   const updateGenres = (genres) => {
     setMovieInfo({ ...movieInfo, genres });
   };
-
 
   const hideCastModal = () => {
     setShowCastModal(false);
@@ -195,26 +196,14 @@ export default function MovieForm() {
 
   const updateCast = (newCast) => {
     const { cast } = movieInfo;
+    const check = cast.filter(
+      ({ profile }) => profile.id === newCast.profile.id
+    );
+    if (check.length)
+      return updateNotification('error', 'Actors already exist');
     setMovieInfo({ ...movieInfo, cast: [...cast, newCast] });
   };
 
-  const handleProfileChange = ({ target }) => {
-    const {value,name} = target;
-    if(name === 'director'){
-      setMovieInfo({ ...movieInfo, director: { name: value } });
-      debounceSearch(handleSearch({ query: value, token,updaterFuc: setDirectorPoster }));
-    
-    }
-
-    if(name === 'writers') {
-      setWriterName(value);
-      debounceSearch(handleSearch({ query: value, token,updaterFuc: setWriterPoster }));
-
-    }
-
-    console.log(writerPoster)
-
-  };
   return (
     <>
       <div onSubmit={handleSubmit} className="flex space-x-3">
@@ -250,59 +239,35 @@ export default function MovieForm() {
             <TagsInput name="tags" value={tags} onChange={updateTags} />
           </div>
           {/* {Director} */}
-          <div>
-            <Label htmlFor="director">Director</Label>
-
-            <LiveSearch
-              name="director"
-              results={directorPoster}
-              renderItem={renderItem}
-              placeholder="Search profile"
-              onSelect={updateDiretor}
-              value={director.name}
-              onChange={handleProfileChange}
-              visible={directorPoster.length}
-            />
-          </div>
+          <DirectorSelector onSelect={updateDirector} />
           {/* Writers */}
           <div>
             <div className="flex justify-between">
-              <LabelWithBadge htmlFor="writers" badge={writers.length}>
+              <LabelWithBadge htmlFor="writers" badge={writers?.length}>
                 Writers
               </LabelWithBadge>
               <ViewAllBtn
                 onClick={displayWritersModal}
-                visible={writers.length}
+                visible={writers?.length}
               >
                 View All
               </ViewAllBtn>
             </div>
 
-            <LiveSearch
-              name="writers"
-              results={writerPoster}
-              renderItem={renderItem}
-              placeholder="Search profile"
-              onSelect={updateWriters}
-              onChange={handleProfileChange}
-              value={writerName}
-              visible={writerPoster.length}
-            />
+            <WriterSelector onSelect={updateWriter} />
           </div>
 
           {/* Cast and crew */}
           <div>
             <div className="flex justify-between">
-              <LabelWithBadge badge={cast.length}>
+              <LabelWithBadge badge={cast?.length}>
                 Add Cast & Crew
               </LabelWithBadge>
-              <ViewAllBtn onClick={displayCastModal} visible={cast.length}>
+              <ViewAllBtn onClick={displayCastModal} visible={cast?.length}>
                 View All
               </ViewAllBtn>
             </div>
-            <CastForm
-              onSubmit={updateCast}
-            />
+            <CastForm onSubmit={updateCast} />
           </div>
           {/* Relese Date */}
           <div>
@@ -310,13 +275,19 @@ export default function MovieForm() {
             <div>
               <input
                 type="date"
+                value={releseDate}
                 onChange={handleChange}
                 name="releseDate"
                 className={`${commonInputClass} rounded border-2 p-1 w-auto`}
               />
             </div>
           </div>
-          <Submit value="Upload" onClick={handleSubmit} type="submit" />
+          <Submit
+            loading={loading}
+            value="Upload"
+            onClick={handleSubmit}
+            type="submit"
+          />
         </div>
         <div className="w-[30%] space-y-5">
           <PosterSelector
@@ -326,7 +297,7 @@ export default function MovieForm() {
             selectedPoster={selectedPosterUI}
             label="Select poster"
           />
-          <GenresSelector badge={genres.length} onClick={displayGenresModal} />
+          <GenresSelector badge={genres?.length} onClick={displayGenresModal} />
 
           <Selector
             onChange={handleChange}
@@ -337,7 +308,7 @@ export default function MovieForm() {
           />
           <Selector
             onChange={handleChange}
-            value={laguage}
+            value={language}
             name="language"
             label="Language"
             options={languageOptions}
@@ -373,52 +344,3 @@ export default function MovieForm() {
     </>
   );
 }
-
-const Label = ({ children, htmlFor }) => {
-  return (
-    <label
-      className="dark:text-dark-subtle text-light-subtle
-          font-semibold"
-      htmlFor={htmlFor}
-    >
-      {children}
-    </label>
-  );
-};
-
-const LabelWithBadge = ({ children, htmlFor, badge }) => {
-  const renderBadge = () => {
-    return (
-      <span
-        className="dark:bg-dark-subtle 
-    bg-light-subtle absolute top-0 right-0 w-5 h-5 
-    rounded-full flex justify-center items-center
-    translate-x-2 -translate-y-1 text-xs
-    "
-      >
-        {badge <= 9 ? badge : '9+'}
-      </span>
-    );
-  };
-  return (
-    <div className="relative">
-      <Label htmlFor={htmlFor}>{children}</Label>
-      {badge ? renderBadge() : null}
-    </div>
-  );
-};
-
-const ViewAllBtn = ({ children, onClick, visible }) => {
-  if (!visible) return null;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="
-  dark:text-white text-primary 
-    hover:underline transtion"
-    >
-      {children}
-    </button>
-  );
-};

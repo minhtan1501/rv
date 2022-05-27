@@ -2,14 +2,14 @@ import React, { useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Container from '../../components/Container';
 import FormContainer from '../../components/form/FormContainer';
-import Submit from '../../components/form/Submit';
-import Title from '../../components/form/Title';
+import Submit from '../../components/Submit';
 import { commonModalClasses } from '../../utils/theme';
 import { useNavigate } from 'react-router-dom';
 import { resendEmailVerificationToken, verifyEmail } from '../../api/auth';
 import { useNotification } from '../../hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import userSlide from '../../redux/userSlide';
+import Title from '../../components/Title';
 
 const isValidOTP = (otp) => {
   let valid = false;

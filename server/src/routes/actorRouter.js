@@ -31,6 +31,8 @@ actorRouter.get("/latest-uploads", auth, admin, actorCtrl.getLatestActors);
 
 actorRouter.get("/search", actorCtrl.search);
 
+actorRouter.get("/actors", actorCtrl.getActors);
+
 actorRouter.get("/single/:id", actorCtrl.getSingleActor);
 
 module.exports = actorRouter;

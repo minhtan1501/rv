@@ -8,7 +8,6 @@ export default function TagsInput({ name, onChange,value }) {
 
   const handleOnChange = ({ target }) => {
     const { value } = target;
-    console.log(value);
     if (value !== ',') setTag(value);
   };
 
@@ -47,7 +46,10 @@ export default function TagsInput({ name, onChange,value }) {
       'border-light-subtle'
     );
   };
-
+  // useEffect(() => {
+  //   if(value) setTags(value); loi o cho nay ne ong
+  // },[value]);
+  
   useEffect(() => {
    if(onChange) onChange(tags);
   },[tags]);

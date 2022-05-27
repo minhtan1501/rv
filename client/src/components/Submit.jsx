@@ -1,6 +1,6 @@
 import React from 'react';
 import {ImSpinner3} from 'react-icons/im'
-export default function Submit({ value,loadding ,type, onClick}) {
+export default function Submit({ value,loading ,type, onClick}) {
   return (
     <button
       type={type || 'submit'}
@@ -16,9 +16,9 @@ export default function Submit({ value,loadding ,type, onClick}) {
       hover:bg-opacity-90 
       transition text-lg
       h-10 flex items-center justify-center"
-      disabled={loadding}
+      disabled={loading}
     >
-  {loadding ? <ImSpinner3 className="animate-spin"/> : value}
+  {loading ? <ImSpinner3 className="animate-spin"/> : value}
     </button>
   );
 }

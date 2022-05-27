@@ -46,5 +46,7 @@ router.patch(
 );
 
 router.delete("/:movieId", auth, admin, movieCtrl.deleteMovie);
+router.get('/movies',auth,admin, movieCtrl.getMovies)
+router.get('/for-update/:movieId',auth,admin, movieCtrl.getMovieForUpdate)
 
 module.exports = router;
