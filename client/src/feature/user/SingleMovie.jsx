@@ -6,13 +6,17 @@ import { parseError } from '../../utils/helper';
 import Container from '../../components/Container';
 import RatingStar from '../../components/RatingStar';
 
-const converReviewCount = (count) => {
+const convertReviewCount = (count) => {
   if (count <= 999) {
     return count;
   }
 
   return parseFloat(count / 1000).toFixed(2) + 'k';
 };
+
+const convertDate = (date = '') => {
+  return date.split("T")[0]
+}
 
 export default function SingleMovie() {
   const [movie, setMovie] = useState({});
@@ -49,10 +53,24 @@ export default function SingleMovie() {
     );
   }
 
-  const { id, trailer, poster, title, reviews, storyLine, director, writers } =
-    movie;
+  const {
+    id,
+    trailer,
+    poster,
+    title,
+    storyLine,
+    reviews = {},
+    director = {},
+    writers = [],
+    cast=[],
+    genres = [],
+    language,
+    releseDate,
+    type,
+  } = movie;
+
   return (
-    <div className="dark:bg-primary bg-white min-h-screen">
+    <div className="dark:bg-primary bg-white min-h-screen pb-10">
       <Container>
         <video poster={poster} controls src={trailer} />
         <div className="flex justify-between">
@@ -73,7 +91,7 @@ export default function SingleMovie() {
             hover:underline"
               to={'/movie/reviews/' + id}
             >
-              {converReviewCount(reviews.ratingCount)} Reviews
+              {convertReviewCount(reviews.ratingCount)} Reviews
             </Link>
 
             <button
@@ -102,12 +120,90 @@ export default function SingleMovie() {
               Writers:
             </p>
             {writers.map((w) => (
-              <p key={w.id} className="
+              <p
+                key={w.id}
+                className="
               text-highlight dark:text-highlight-dark 
-              hover:underline cursor-pointer">
+              hover:underline cursor-pointer"
+              >
                 {w.name}
               </p>
             ))}
+          </div>
+
+          <div className="flex space-x-2">
+            <p className="text-light-subtle dark:text-dark-subtle font-semibold">
+              Cast:
+            </p>
+            {cast.map((c) =>
+              c.leadActor ? (
+                <p
+                  key={c.id}
+                  className="
+              text-highlight dark:text-highlight-dark 
+              hover:underline cursor-pointer"
+                >
+                  {c.profile.name}
+                </p>
+              ) : null
+            )}
+          </div>
+
+          <div className="flex space-x-2">
+            <p className="text-light-subtle dark:text-dark-subtle font-semibold">
+              Language:
+            </p>
+            <p
+              className="
+              text-highlight dark:text-highlight-dark 
+              hover:underline cursor-pointer"
+            >
+              {language}
+            </p>
+          </div>
+
+          <div className="flex space-x-2">
+            <p className="text-light-subtle dark:text-dark-subtle font-semibold">
+              Release Date:
+            </p>
+            <p
+              className="
+              text-highlight dark:text-highlight-dark 
+              hover:underline cursor-pointer"
+            >
+              {convertDate(releseDate)}
+            </p>
+          </div>
+
+          <div className="flex space-x-2">
+            <p className="text-light-subtle dark:text-dark-subtle font-semibold">
+              Genres:
+            </p>
+            {genres.map((g,index) =>
+               (
+                <p
+                  key={index}
+                  className="
+              text-highlight dark:text-highlight-dark 
+              hover:underline cursor-pointer"
+                >
+                  {g}
+                </p>
+              ) 
+            )}
+          </div>
+
+          <div className="flex space-x-2">
+            <p className="text-light-subtle dark:text-dark-subtle font-semibold">
+              Type:
+            </p>
+            <p
+              className="
+              text-highlight dark:text-highlight-dark 
+              hover:underline cursor-pointer"
+            >
+              {type}
+            </p>
           </div>
         </div>
       </Container>
