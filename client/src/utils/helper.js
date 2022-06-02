@@ -16,3 +16,11 @@ export const renderItem = (result) => {
   );
 };
 
+export const parseError = (string) => {
+  return string?.toString()?.split('Error: ')[1]
+}
+
+export  const trimTitle = (text = '') => {
+  if (text.length <= 20) return text;
+  return text.substring(0, 20) + '...';
+};

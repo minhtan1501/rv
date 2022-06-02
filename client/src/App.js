@@ -11,11 +11,11 @@ import Singin from "./feature/auth/Singin";
 import Home from "./feature/home";
 import AdminNavigator from "./feature/navigator/AdminNavigator";
 import Navbar from "./feature/user/Navbar";
+import SingleMovie from "./feature/user/SingleMovie";
 import { getUserInfo, refreshToken } from "./redux/userSlide";
 function App() {
   const user = useSelector(state => state.user);
   const isAdmin = user.profile?.role === 'admin'
-  const timeoutId = useRef();
   const dispatch  = useDispatch()
   useEffect(()=>{
     const getInfo = async() =>{
@@ -26,29 +26,28 @@ function App() {
         }
       }
       catch(err){
-
+        localStorage.removeItem('firstLogin')
       }
     }
     getInfo()
   },[user.token])
-  useEffect(()=>{
-    const refresh = async() =>{
-      try {
-        if(localStorage.getItem("firstLogin")){
-          const res = await dispatch(refreshToken());
-          unwrapResult(res)
-        }
-      }catch(err){
-
+  const refresh = async() =>{
+    try {
+      if(localStorage.getItem("firstLogin")){
+        const res = await dispatch(refreshToken());
+        unwrapResult(res)
       }
+    }catch(err){
+      console.log("jelo")
+      localStorage.removeItem('firstLogin')
+
     }
+  }
+  useEffect(()=>{
     refresh()
-    timeoutId.current =  setTimeout(()=>{
+    setInterval (()=>{
       refresh()
     },10*60*1000)
-
-    return ()=> clearTimeout(timeoutId)
-
   },[user.login,dispatch])
 
   if(isAdmin){
@@ -67,6 +66,8 @@ function App() {
     <Route path="/auth/reset-password" element={<ConfirmPassword/>}/>
     <Route path="/auth/forget-password" element={<ForgetPassword/>}/>
     <Route path="/auth/verification" element={<EmailVerification/>}/>
+    <Route path="/movie/:movieId" element={<SingleMovie/>}/>
+    
     <Route path="/*" element={<NotFound/>}/>
     
     </Routes>

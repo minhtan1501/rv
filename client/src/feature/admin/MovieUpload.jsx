@@ -13,7 +13,7 @@ function MovieUpload({ visible, onClose }) {
   const [videoUploader, setVideoUploader] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [videoInfo, setVideoInfo] = useState({});
-  const [loadding, setLoadding] = useState(false);
+  const [loading, setLoading] = useState(false);
   const token = useSelector(getToken);
 
   const handleTypeError = (e) => {
@@ -51,13 +51,13 @@ function MovieUpload({ visible, onClose }) {
       if (!videoInfo.url && !videoInfo.public_id)
         return updateNotification('error', 'Trailer is missing!');
       data.append('trailer', JSON.stringify(videoInfo));
-      setLoadding(true);
+      setLoading(true);
       const res = await uploadMovie(data, token);
       console.log(res);
-      setLoadding(false);
+      setLoading(false);
       onClose();
     } catch (error) {
-      setLoadding(false);
+      setLoading(false);
       console.log(error);
     }
   };
@@ -84,8 +84,9 @@ function MovieUpload({ visible, onClose }) {
       ) : (
         videoUploader &&
         <MovieForm
-          loadding={loadding}
-          onSubmit={!loadding ? handleSubmit : null}
+          loading={loading}
+          onSubmit={!loading ? handleSubmit : null}
+          btnTitle={'Upload'}
         />
       )}
     </ModalContainer>

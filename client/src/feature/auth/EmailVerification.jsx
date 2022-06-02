@@ -10,6 +10,7 @@ import { useNotification } from '../../hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import userSlide from '../../redux/userSlide';
 import Title from '../../components/Title';
+import { parseError } from '../../utils/helper';
 
 const isValidOTP = (otp) => {
   let valid = false;
@@ -26,7 +27,7 @@ function EmailVerification() {
   const inputRef = useRef();
   const dispatch = useDispatch();
   const { state } = useLocation();
-  const [loadding,setLoadding] = useState(false)
+  const [loading,setLoading] = useState(false)
   const navigate = useNavigate();
   // get state from singup
   const stateUser = state?.user;
@@ -45,8 +46,13 @@ function EmailVerification() {
   };
 
   const handleOtpChange = ({ target }, index) => {
+    console.log('1');
     const { value } = target;
     const newOTP = [...otp];
+    if(!value) {
+      newOTP[index] = ''
+      return setOtp(newOTP)
+    }
     newOTP[index] = value.substring(value.length - 1, value.length);
     if (!value) focusPreInputField(index);
     else focusNextInputField(index);
@@ -62,9 +68,9 @@ function EmailVerification() {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      setLoadding(true)
+      setLoading(true)
       if (!isValidOTP(otp)){
-        setLoadding(false)
+        setLoading(false)
         return updateNotification('error', 'Invalid OTP');
       } 
       
@@ -74,10 +80,10 @@ function EmailVerification() {
       });
       dispatch(userSlide.actions.setToken(res.accessToken));
       updateNotification('success', res.message);
-      setLoadding(false)
+      setLoading(false)
       if (isLogin) navigate('/');
     } catch (error) {
-      setLoadding(false)
+      setLoading(false)
       updateNotification(
         'error',
         error?.toString().replace('Error:', '').trim()
@@ -87,17 +93,17 @@ function EmailVerification() {
 
   const handleOTPResend = async() =>{
     try {
-      setLoadding(true)
+      setLoading(true)
       const res = await resendEmailVerificationToken({userId:stateUser})
       updateNotification('success', res.message);
-      setLoadding(false)
+      setLoading(false)
 
     }
     catch (error) {
-      setLoadding(false)
+      setLoading(false)
       updateNotification(
         'error',
-        error?.toString().replace('Error:', '').trim()
+       parseError(error)
       );
     }
   }
@@ -136,7 +142,7 @@ function EmailVerification() {
             })}
           </div>
           <div>
-            <Submit value="Verify Account" loadding={loadding}/>
+            <Submit value="Verify Account" loading={loading}/>
             <button
               type="button"
               onClick={handleOTPResend}

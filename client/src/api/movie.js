@@ -36,3 +36,46 @@ export const getMovieForUpdate = async (id,token) =>{
     headers: { Authorization: token}
   })
 }
+
+export const updateMovie = (id,formData, token) => {
+  const url = `/movie/update/${id}`;
+  return axiosClient.patch(url, formData, {
+    headers: { Authorization: token, 'content-type': 'multipart/form-data' },
+    withCredentials: true,
+  });
+};
+
+export const deleteMovie = (id, token) => {
+  const url = `/movie/${id}`;
+  return axiosClient.delete(url,{
+    headers: { Authorization: token, 'content-type': 'multipart/form-data' },
+    withCredentials: true,
+  });
+};
+
+export const searchMovieForAdmin = (value, token) => {
+  const url = `/movie/search?title=${value}`;
+  return axiosClient.get(url,{
+    headers: { Authorization: token, 'content-type': 'multipart/form-data' },
+    withCredentials: true,
+  });
+};
+
+export const getTopRatedMovies = (type) => {
+  let url = '/movie/top-rated';
+  if(type) url = url + "?type=" + type
+
+  return axiosClient.get(url);
+};
+
+export const getLatestUploads = () => {
+  const url = '/movie/latest-uploads';
+
+  return axiosClient.get(url);
+};
+
+export const getSingleMovie = (movieId) => {
+  const url = '/movie/single/' + movieId;
+  return axiosClient.get(url);
+
+}

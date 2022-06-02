@@ -105,11 +105,11 @@ function Actors() {
       try {
         setLoading(true);
         const {message} = await deleteActor(selectedProfile.id,token)
-        setLoading(false);
         if(message) updateNotification('success',message);
         setSelectedProfile(null)
         hideConfirmModal()
         fetchActors(currentPageNo)
+        setLoading(false);
     }
     catch(err) {
       setLoading(false);

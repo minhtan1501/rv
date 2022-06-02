@@ -10,6 +10,7 @@ import Title from '../../components/Title';
 import InputFiled from '../../components/formFiled/InputFiled';
 import { useNotification } from '../../hooks';
 import { commonModalClasses } from '../../utils/theme';
+import { parseError } from '../../utils/helper';
 
 function removeAscent (str) {
   if (str === null || str === undefined) return str;
@@ -82,7 +83,7 @@ function Singup() {
     }
     catch(error){
       setLoading(false)
-      updateNotification('error',error?.toString().replace("Error:",'').trim())
+      updateNotification('error',parseError(error))
     }
   }
   useEffect(()=>{

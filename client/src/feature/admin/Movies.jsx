@@ -1,82 +1,104 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getMovieForUpdate, getMovies } from '../../api/movie';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteMovie, getMovieForUpdate, getMovies } from '../../api/movie';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 import UpdateMovie from '../../components/modals/UpdateMovie';
 import MovieListItem from '../../components/MovieListItem';
 import NextAndPrevButton from '../../components/NextAndPrevButton';
 import { useNotification } from '../../hooks';
+import movieSlice, {fetchMovie} from '../../redux/movieSlice';
 import { getToken } from '../../redux/selector';
+import { parseError } from '../../utils/helper';
 
-const limit = 1;
-let currentPageNo = 0;
 
 function Movies() {
   const [movies, setMovies] = useState([]);
   const token = useSelector(getToken);
-  const [reachedToEnd, setReachedToEnd] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
-
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { updateNotification } = useNotification();
-
-  const fetchMovies = async (pageNo) => {
-    try {
-      const { movies } = await getMovies(pageNo, limit, token);
-      setMovies([...movies]);
-      if (!movies.length) {
-        currentPageNo = pageNo - 1;
-        return setReachedToEnd(true);
-      }
-    } catch (e) {
-      updateNotification('error', e);
-    }
+  const dispatch = useDispatch();
+  const {newMovies,currentPageNo} = useSelector(state =>state.movie)
+  const fetchMovies =  (pageNo = 0) => {
+     return dispatch(fetchMovie({pageNo,token}))
   };
   useEffect(() => {
-    fetchMovies();
-  }, []);
+     fetchMovies(currentPageNo);
+  }, [currentPageNo]);
 
   const handleOnNextClick = () => {
-    if (reachedToEnd) return;
-    currentPageNo += 1;
-    fetchMovies(currentPageNo);
+    dispatch(movieSlice.actions.nextClick())
+    
   };
 
   const handleOnPrevClick = () => {
-    if (currentPageNo <= 0) return;
-    if (reachedToEnd) setReachedToEnd(false);
-    currentPageNo -= 1;
-    fetchMovies(currentPageNo);
+     dispatch(movieSlice.actions.prevClick())
+     
   };
+  
+  // const hideUpdateForm = () => {
+  //   setShowUpdateModal(false);
+  // };
 
-  const handleOnEditClick = async ({ id }) => {
-    try {
-      const { movie } = await getMovieForUpdate(id, token);
-      setSelectedMovie(movie);
-      setShowUpdateModal(true);
-    } catch (error) {
-      updateNotification('error', error);
-    }
-  };
+  // const handleOnUpdate = (movie) => {
+  //   const updatedMovie = movies.map((m) => {
+  //     if (m.id === movie.id) return movie;
+  //     return m;
+  //   });
+  //   setMovies([...updatedMovie]);
+  // };
+  
+
+  // const handleOnDeleteClick = (movie) => {
+  //   setSelectedMovie(movie);
+  //   setShowConfirmModal(true);
+  // };
+
+
+  const handleUIUpdate = () => {
+    fetchMovies(currentPageNo);
+  }
+
 
   return (
     <>
       <div className="space-y-3 p-5">
-        {movies.map((movie) => {
+        {newMovies.map((movie) => {
           return (
             <MovieListItem
               movie={movie}
               key={movie.id}
-              onEditClick={() => handleOnEditClick(movie)}
+              token={token}
+              alterUpdate={handleUIUpdate}
+              // onEditClick={() => handleOnEditClick(movie)}
+              // onDeleteClick={() => handleOnDeleteClick(movie)}
+              alterDelete={handleUIUpdate}
             />
           );
         })}
-        <NextAndPrevButton
-          className="mt-5"
-          onNextClick={handleOnNextClick}
-          onPrevClick={handleOnPrevClick}
-        />
+        
+          <NextAndPrevButton
+            className="mt-5"
+            onNextClick={handleOnNextClick}
+            onPrevClick={handleOnPrevClick}
+          />
       </div>
-      <UpdateMovie visible={showUpdateModal} initialState={selectedMovie} />
+      {/* <ConfirmModal
+        visible={showConfirmModal}
+        onCancel={hideConfirmModal}
+        onConfirm={handleOnDeleteConfirm}
+        title="Are you sure?"
+        subTitle="This action will remove this movie permanently!"
+        loading={loading}
+      /> */}
+      {/* <UpdateMovie
+        onSuccess={handleOnUpdate}
+        visible={showUpdateModal}
+        initialState={selectedMovie}
+        onClose={hideUpdateForm}
+      /> */}
     </>
   );
 }

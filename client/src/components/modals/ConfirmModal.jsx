@@ -19,7 +19,7 @@ export default function ConfirmModal({
 
         <div className="flex items-center space-x-3 mt-3">
           {loading ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 text-primary dark:text-white">
               <ImSpinner3 className="animate-spin" />
               <span>Please wait</span>
             </div>

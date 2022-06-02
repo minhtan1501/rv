@@ -3,6 +3,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 export default function TagsInput({ name, onChange,value }) {
   const [tag, setTag] = useState('');
   const [tags, setTags] = useState([]);
+
   const input = useRef();
   const tagsInput = useRef();
 
@@ -46,13 +47,13 @@ export default function TagsInput({ name, onChange,value }) {
       'border-light-subtle'
     );
   };
-  // useEffect(() => {
-  //   if(value) setTags(value); loi o cho nay ne ong
-  // },[value]);
+  useEffect(() => {
+    if(value.length) setTags(value)
+  },[value]);
   
   useEffect(() => {
-   if(onChange) onChange(tags);
-  },[tags]);
+    if(onChange) onChange(tags)
+  },[tag])
 
   useEffect(() => {
     input.current?.scrollIntoView({ behavior: 'smooth' });

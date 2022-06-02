@@ -9,6 +9,7 @@ import Title from '../../components/Title'
 import InputFiled from '../../components/formFiled/InputFiled'
 import { useNotification } from '../../hooks'
 import { commonModalClasses } from '../../utils/theme'
+import { parseError } from '../../utils/helper'
 function ConfirmPassword() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
@@ -43,9 +44,9 @@ function ConfirmPassword() {
       nagative('/auth/signin',{replace:true})
       
     }
-    catch(err) {
+    catch(error) {
       setLoading(false);
-      updateNotification('error',err?.toString().replace("Error:",'').trim())
+      updateNotification('error',parseError(error))
     }
 
   }

@@ -37,7 +37,7 @@ const defaultMovieInfo = {
   status: '',
 };
 
-export default function MovieForm({ onSubmit, loading,initialState }) {
+export default function MovieForm({ onSubmit,btnTitle, loading,initialState }) {
   const [movieInfo, setMovieInfo] = useState({ ...defaultMovieInfo });
   const [showWritersModal, setShowWritersModal] = useState(false);
   const [showCastModal, setShowCastModal] = useState(false);
@@ -120,7 +120,6 @@ export default function MovieForm({ onSubmit, loading,initialState }) {
     type,
     releseDate
   } = movieInfo;
-  console.log(movieInfo)
   const handleChange = ({ target }) => {
     const { value, name, files } = target;
     if (name === 'poster') {
@@ -132,7 +131,7 @@ export default function MovieForm({ onSubmit, loading,initialState }) {
   };
 
   const updateTags = (tags) => {
-    setMovieInfo({ ...movieInfo, tags: [...tags] });
+    setMovieInfo({ ...movieInfo, tags: tags });
   };
 
   const updateDirector = (director) => {
@@ -203,6 +202,10 @@ export default function MovieForm({ onSubmit, loading,initialState }) {
       return updateNotification('error', 'Actors already exist');
     setMovieInfo({ ...movieInfo, cast: [...cast, newCast] });
   };
+
+  useEffect(() => {
+    window.scroll(0,0)
+  },[])
 
   return (
     <>
@@ -284,7 +287,7 @@ export default function MovieForm({ onSubmit, loading,initialState }) {
           </div>
           <Submit
             loading={loading}
-            value="Upload"
+            value={btnTitle}
             onClick={handleSubmit}
             type="submit"
           />

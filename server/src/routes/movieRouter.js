@@ -3,7 +3,7 @@ const { auth, admin } = require("../middleware/auth");
 const movieCtrl = require("../controllers/movieCtrl");
 const { uploadVideo, uploadImage } = require("../middleware/multer");
 const { parseData } = require("../utils/helper");
-const { validateMovie, validate } = require("../middleware/validator");
+const { validateMovie, validate, validateTrailer } = require("../middleware/validator");
 
 router.post(
   "/upload-trailer",
@@ -20,6 +20,7 @@ router.post(
   uploadImage.single("poster"),
   parseData,
   validateMovie,
+  validateTrailer,
   validate,
   movieCtrl.createMovie
 );
@@ -35,18 +36,26 @@ router.patch(
 );
 
 router.patch(
-  "/update-movie-with-poster/:movieId",
+  "/update/:movieId",
   auth,
   admin,
   uploadImage.single("poster"),
   parseData,
   validateMovie,
   validate,
-  movieCtrl.updateMovieWithPoster
-);
+  movieCtrl.updateMovie)
 
 router.delete("/:movieId", auth, admin, movieCtrl.deleteMovie);
 router.get('/movies',auth,admin, movieCtrl.getMovies)
 router.get('/for-update/:movieId',auth,admin, movieCtrl.getMovieForUpdate)
+router.get('/search',auth,admin, movieCtrl.searchMovie)
+
+
+//for normal user
+
+router.get('/latest-uploads',movieCtrl.getLatestUploads)
+router.get('/single/:movieId',movieCtrl.getSingleMovie)
+router.get('/related/:movieId',movieCtrl.getRelatedMovies)
+router.get('/top-rated',movieCtrl.getTopRatedMovies)
 
 module.exports = router;

@@ -8,25 +8,25 @@ const {
   validatePassword,
   signInValidator,
 } = require("../middleware/validator");
-const userRoute = require("express").Router();
-userRoute.get("/logout", userCrtl.logout);
-userRoute.get("/info",auth, userCrtl.getUserInfo);
-userRoute.post("/verify-email", userCrtl.verifyEmail);
-userRoute.post("/resend-email-verify", userCrtl.resendEmailVerificationToken);
-userRoute.get("/refreshtoken", userCrtl.refreshToken);
-userRoute.post("/create", userValidator, validate, userCrtl.createUser);
-userRoute.post("/login", signInValidator, validate, userCrtl.login);
-userRoute.post("/forget-password", userCrtl.forgetPassword);
-userRoute.post(
+const userRouter = require("express").Router();
+userRouter.get("/logout", userCrtl.logout);
+userRouter.get("/info",auth, userCrtl.getUserInfo);
+userRouter.post("/verify-email", userCrtl.verifyEmail);
+userRouter.post("/resend-email-verify", userCrtl.resendEmailVerificationToken);
+userRouter.get("/refreshtoken", userCrtl.refreshToken);
+userRouter.post("/create", userValidator, validate, userCrtl.createUser);
+userRouter.post("/login", signInValidator, validate, userCrtl.login);
+userRouter.post("/forget-password", userCrtl.forgetPassword);
+userRouter.post(
   "/verify-pass-reset-token",
   isValidPassRestToken,
   userCrtl.sendResetPasswordTokenStatus
 );
-userRoute.post(
+userRouter.post(
   "/reset-password",
   validatePassword,
   validate,
   isValidPassRestToken,
   userCrtl.resetPassword
 );
-module.exports = userRoute;
+module.exports = userRouter;

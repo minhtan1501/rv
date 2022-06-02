@@ -40,12 +40,16 @@ axiosClient.interceptors.response.use(
       '/actor/actors',
       '/movie/movies',
       '/actor/:id',
-      '/movie/for-update/:id'
+      '/movie/for-update/',
+      '/movie/update/',
+      '/movie/'
 
     ];
-    if (URLS.includes(config.url) && status === 400) {
+    //URLS.includes(config.url) && status === 400
+    if(config.url === '/user/refreshtoken')localStorage.removeItem('firstLogin')
+    if ( status === 400 || status === 404 ) {
       console.log(data?.error);
-      throw new Error(data?.error);
+      throw new Error(data?.error || data?.message?.name);
     }
     return Promise.reject(error.response);
   }

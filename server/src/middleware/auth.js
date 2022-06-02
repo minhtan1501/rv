@@ -5,6 +5,7 @@ exports.auth = async(req, res, next) => {
     try {
         const token = req.header("Authorization");
         if(!token) {
+            console.log(token)
             sendError(res,"Please login or Register");
         }
         const id = await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
@@ -12,7 +13,7 @@ exports.auth = async(req, res, next) => {
         next();
     }
     catch(err) {
-        res.status(404).json({message:err})
+        sendError(res,"Please login or Register");
     }
 }
 

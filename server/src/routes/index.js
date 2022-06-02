@@ -1,12 +1,13 @@
 const { handleNotFound } = require("../utils/helper")
 const actorRouter = require("./actorRouter")
-const userRoute = require("./userRouter")
-const movieRoute = require("./movieRouter")
+const userRouter = require("./userRouter")
+const movieRouter = require("./movieRouter")
+const reviewRouter = require("./reviewRouter")
 function route(app){
-    
-    app.use('/api/user',userRoute)
+    app.use('/api/review',reviewRouter)
+    app.use('/api/user',userRouter)
     app.use('/api/actor',actorRouter)
-    app.use('/api/movie',movieRoute)
+    app.use('/api/movie',movieRouter)
     app.use('/*',handleNotFound)
 }
 

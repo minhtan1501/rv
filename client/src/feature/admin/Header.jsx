@@ -4,6 +4,7 @@ import { BsFillSunFill } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import AppSearchForm from '../../components/form/AppSearchForm';
 import themeSlice from '../../redux/themeSlice';
+import {useNavigate} from 'react-router-dom'
 function Header({onAddMoviesClick,onAddActorsClick}) {
   const options = [
     {
@@ -21,6 +22,8 @@ function Header({onAddMoviesClick,onAddActorsClick}) {
   const dispatch = useDispatch();
   const { status } = useSelector((state) => state.theme);
   const [oldTheme, setOldTheme] = React.useState(status);
+  const nagative = useNavigate();
+
   const handleToggleChangeTheme = (theme) => {
     dispatch(themeSlice.actions.toggleTheme(theme));
   };
@@ -30,9 +33,16 @@ function Header({onAddMoviesClick,onAddActorsClick}) {
     document.documentElement.classList.add(status);
   }, [oldTheme, status]);
 
+
+  const handleSearchSubmit = (query) =>{
+   if(!query.trim()) return;
+
+    nagative('/search?title='+query)
+  }
+
   return (
     <div className="flex items-center justify-between relative p-5">
-     <AppSearchForm placeholder="Search Movie..."/>
+     <AppSearchForm onSubmit={handleSearchSubmit} placeholder="Search Movie..."/>
       <div className="flex space-x-3 items-center">
         <button
           onClick={() => handleToggleChangeTheme(status)}
@@ -102,7 +112,7 @@ function CreateOptions({ options,visible, onClose }) {
       id={containerId}
       
       className="
-      absolute right-0 top-12 
+      absolute right-0 top-16 
       flex flex-col space-y-3 p-5
       dark:bg-secondary bg-white 
       drop-shadow-lg animate-scale
