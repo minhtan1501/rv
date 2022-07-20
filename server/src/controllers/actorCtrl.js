@@ -105,7 +105,7 @@ const actorCtrl = {
       const result = await Actor.findById(id);
       if (!result) return sendError(res, "Actor not found!");
 
-      res.status(200).json(formatActors(result));
+      res.status(200).json({actor:formatActors(result)});
     } catch (error) {}
   },
   getActors: async (req, res, next) => {

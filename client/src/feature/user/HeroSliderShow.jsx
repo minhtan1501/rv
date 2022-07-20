@@ -6,6 +6,8 @@ import { parseError } from '../../utils/helper';
 import { Link } from 'react-router-dom';
 let count = 0;
 
+let newTime = 0;
+let lastTime = 0;
 export default function HeroSliderShow() {
   const [currentSlide, setCurrentSlide] = useState({});
   const [slides, setSlides] = useState([]);
@@ -17,9 +19,9 @@ export default function HeroSliderShow() {
   const timeId = useRef();
   const { updateNotification } = useNotification();
 
-  const fetchLatestUploads = async () => {
+  const fetchLatestUploads = async (signal) => {
     try {
-      const { movies } = await getLatestUploads();
+      const { movies } = await getLatestUploads(signal);
       setSlides([...movies]);
       setCurrentSlide(movies[0]);
     } catch (error) {
@@ -28,7 +30,9 @@ export default function HeroSliderShow() {
   };
 
   const startSlideShow = () => {
-    timeId.current = setInterval(handleOnNextClick, 3500);
+    timeId.current = setInterval(() => {
+      handleOnNextClick();
+    }, 3500);
   };
 
   const pauseSlideShow = () => {
@@ -97,7 +101,9 @@ export default function HeroSliderShow() {
   };
 
   useEffect(() => {
-    fetchLatestUploads();
+    const ac = new AbortController();
+    fetchLatestUploads(ac.signal);
+
     document.addEventListener('visibilitychange', handleOnVisibilityChange);
     return () => {
       pauseSlideShow();
@@ -105,6 +111,7 @@ export default function HeroSliderShow() {
         'visibilitychange',
         handleOnVisibilityChange
       );
+      ac.abort();
     };
   }, []);
 
@@ -119,7 +126,7 @@ export default function HeroSliderShow() {
 
   return (
     <div className="w-full flex ">
-      <div className="w-4/5 aspect-video relative overflow-hidden">
+      <div className="md:w-4/5 w-full aspect-video relative overflow-hidden">
         {/* current slide */}
         <Slide
           title={currentSlide.title}
@@ -142,7 +149,7 @@ export default function HeroSliderShow() {
           onPrevClick={handleOnPreClick}
         />
       </div>
-      <div className="w-1/5 space-y-3 px-3">
+      <div className="w-1/5 space-y-3 px-3 md:block hidden">
         <h1
           className="
         font-semibold text-2xl 
@@ -189,7 +196,11 @@ const Slide = forwardRef((props, ref) => {
   const { title, src, className = '', id, ...rest } = props;
   return (
     <Link to={'/movie/' + id}>
-      <div ref={ref} className={'cursor-pointer w-full block ' + className} {...rest}>
+      <div
+        ref={ref}
+        className={'cursor-pointer w-full block ' + className}
+        {...rest}
+      >
         {src ? (
           <img className="aspect-video object-cover" src={src} alt="" />
         ) : null}
@@ -198,7 +209,7 @@ const Slide = forwardRef((props, ref) => {
             className="
           absolute inset-0 flex 
           flex-col justify-end p-3
-          bg-gradient-to-t from-white dark:from-primary"
+          bg-gradient-to-t via-transparent from-white dark:from-primary dark:via-transparent"
           >
             <h1
               className="

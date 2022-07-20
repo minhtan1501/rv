@@ -7,6 +7,7 @@ import MovieForm from '../../components/form/MovieForm';
 import ModalContainer from '../../components/modals/ModalContainer';
 import { useNotification } from '../../hooks/index';
 import { getToken } from '../../redux/selector';
+import { parseError } from '../../utils/helper';
 function MovieUpload({ visible, onClose }) {
   const { updateNotification } = useNotification();
   const [videoSelected, setVideoSelected] = useState(false);
@@ -29,6 +30,7 @@ function MovieUpload({ visible, onClose }) {
       const { url, public_id } = result;
       setVideoInfo({ url, public_id });
     } catch (error) {
+    setVideoSelected(false)
       updateNotification('error', error);
     }
   };
@@ -52,22 +54,31 @@ function MovieUpload({ visible, onClose }) {
         return updateNotification('error', 'Trailer is missing!');
       data.append('trailer', JSON.stringify(videoInfo));
       setLoading(true);
-      const res = await uploadMovie(data, token);
-      console.log(res);
+      const { movie } = await uploadMovie(data, token);
       setLoading(false);
+      updateNotification('success', 'Movie uploads successfully!');
+      restState()
       onClose();
     } catch (error) {
       setLoading(false);
-      console.log(error);
+      updateNotification('error', parseError(error));
     }
   };
+   
+  const restState = () =>{
+    setVideoSelected(false);
+    setVideoUploader(false);
+    setUploadProgress(0);
+    setVideoInfo({})
+  }
+
 
   useEffect(() => {
     window.scroll(0, 0);
   }, [visible]);
 
   return (
-    <ModalContainer visible={visible}>
+    <ModalContainer visible={visible} onClose={onClose}>
       <div className="mb-5">
         <UpLoadProgress
           visible={!videoUploader && videoSelected}
@@ -82,12 +93,13 @@ function MovieUpload({ visible, onClose }) {
           handleChange={handleChange}
         />
       ) : (
-        videoUploader &&
-        <MovieForm
-          loading={loading}
-          onSubmit={!loading ? handleSubmit : null}
-          btnTitle={'Upload'}
-        />
+        videoUploader && (
+          <MovieForm
+            loading={loading}
+            onSubmit={!loading ? handleSubmit : null}
+            btnTitle={'Upload'}
+          />
+        )
       )}
     </ModalContainer>
   );
@@ -97,10 +109,6 @@ export default MovieUpload;
 
 const TrailerSelector = ({ visible, handleChange, onTypeError }) => {
   if (!visible) return null;
-  
-  const handleClick = (e) => {
-    e.preventDefault();
-  }
 
   return (
     <div className="h-full flex items-center justify-center">
@@ -109,16 +117,15 @@ const TrailerSelector = ({ visible, handleChange, onTypeError }) => {
         handleChange={handleChange}
         types={['mp4', 'avi']}
       >
-        <div
+        <label
           className="w-48 h-48 border border-dashed 
             dark:border-dark-subtle border-light-subtle
             rounded-full flex items-center justify-center flex-col
             dark:text-dark-subtle text-secondary cursor-pointer"
-          onClick={handleClick}
         >
           <AiOutlineCloudUpload size={80} />
           <p>Drop your file here!</p>
-        </div>
+        </label>
       </FileUploader>
     </div>
   );

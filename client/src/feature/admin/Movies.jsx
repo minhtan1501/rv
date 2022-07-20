@@ -12,13 +12,7 @@ import { parseError } from '../../utils/helper';
 
 
 function Movies() {
-  const [movies, setMovies] = useState([]);
   const token = useSelector(getToken);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { updateNotification } = useNotification();
   const dispatch = useDispatch();
   const {newMovies,currentPageNo} = useSelector(state =>state.movie)
   const fetchMovies =  (pageNo = 0) => {

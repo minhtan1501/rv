@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+ app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "http://localhost:3000");

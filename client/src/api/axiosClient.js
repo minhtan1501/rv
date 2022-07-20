@@ -25,8 +25,8 @@ axiosClient.interceptors.response.use(
   function (error) {
     // // Any status codes that falls outside the range of 2xx cause this function to trigger
     // // Do something with response error
-    const { config, status, data } = error.response;
-    console.log(error.response);
+    if(!error.response) return Promise.reject(error?.message);
+    const { config , status, data } = error?.response;
     const URLS = [
       '/user/create',
       '/user/resend-email-verify',
@@ -42,16 +42,16 @@ axiosClient.interceptors.response.use(
       '/actor/:id',
       '/movie/for-update/',
       '/movie/update/',
-      '/movie/'
-
+      '/movie/',
     ];
     //URLS.includes(config.url) && status === 400
-    if(config.url === '/user/refreshtoken')localStorage.removeItem('firstLogin')
-    if ( status === 400 || status === 404 ) {
+    if (config?.url === '/user/refreshtoken')
+      localStorage.removeItem('firstLogin');
+    if (status === 400 || status === 404) {
       console.log(data?.error);
       throw new Error(data?.error || data?.message?.name);
     }
-    return Promise.reject(error.response);
+    return Promise.reject(error?.response || error?.message);
   }
 );
 export default axiosClient;

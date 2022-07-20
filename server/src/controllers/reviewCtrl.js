@@ -1,12 +1,18 @@
 const Review = require("../models/reviewModel");
 const Movie = require("../models/movieModel");
-const { sendError } = require("../utils/helper");
+const User = require("../models/userModel");
+const { sendError, getAverageRatings } = require("../utils/helper");
 const { isValidObjectId } = require("mongoose");
 const reviewCtrl = {
   addReview: async (req, res) => {
     const { movieId } = req.params;
     const { content, rating } = req.body;
     const userId = req.user.id;
+
+    const user = await User.findById(userId);
+
+    if(!user.isVerified) return sendError(res,"Please verify your email first!")
+    
 
     if (!isValidObjectId(movieId)) return sendError(res, "Invalid Movie!");
     if (!isValidObjectId(userId)) return sendError(res, "Invalid user ID");
@@ -37,7 +43,9 @@ const reviewCtrl = {
     // saving new review
     await newReview.save();
 
-    res.status(200).json({ message: "Your review has been added." });
+    const reviews = await getAverageRatings(movie._id);
+
+    res.status(200).json({ message: "Your review has been added.", reviews });
   },
   updateReview: async (req, res) => {
     const { reviewId } = req.params;
@@ -89,7 +97,7 @@ const reviewCtrl = {
           select: "name",
         },
       })
-      .select("reviews");
+      .select("reviews title");
 
     const reviews = movie.reviews?.map((r) => {
       const { owner, content, rating, _id: reviewID } = r;
@@ -105,7 +113,12 @@ const reviewCtrl = {
       };
     });
 
-    res.status(200).json({ reviews: reviews || [] });
+    res.status(200).json({ movie:{
+      title: movie.title,
+      reviews
+      
+    } 
+   });
   },
 };
 

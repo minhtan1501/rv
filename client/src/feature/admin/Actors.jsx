@@ -129,7 +129,7 @@ function Actors() {
           />
         </div>
         <NotFoundText text="Record not found" visible={resultNotFound} />
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid xl:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-5">
           {results.length || resultNotFound
             ? results?.map((p) => {
                 return (

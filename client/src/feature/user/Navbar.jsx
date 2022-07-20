@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import themeSlice from '../../redux/themeSlice';
 import { userLogout } from '../../redux/userSlide';
+import AppSearchForm from '../../components/form/AppSearchForm';
 function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,16 +18,19 @@ function Navbar() {
   };
 
   //handle logout
-  const handleLogout =  async() => {
+  const handleLogout = async () => {
     try {
-      await  dispatch(userLogout())
-        navigate('/')
-
-    }catch (err) {
-      console.log(err)
+      await dispatch(userLogout());
+      navigate('/');
+    } catch (err) {
+      console.log(err);
     }
-   
+  };
+
+  const handleSearchSubmit = (query) =>{
+    navigate('/movie/search?title='+query);
   }
+
   React.useEffect(() => {
     document.documentElement.classList.remove(oldTheme);
     setOldTheme(status);
@@ -37,11 +41,11 @@ function Navbar() {
       <Container className="p-2">
         <div className="flex justify-between items-center">
           <Link to="/">
-            <img src="logo.png" alt="" className="h-10" />
+            <img src="logo.png" alt="" className="sm:h-10 h-8" />
           </Link>
-          <ul className="flex space-x-4 items-center">
+          <ul className="flex sm:space-x-4 space-x-2 items-center">
             <li>
-              <button className=" dark:bg-white bg-dark-subtle p-1 rounded">
+              <button className=" dark:bg-white bg-dark-subtle p-1 rounded sm:text-lg">
                 <BsFillSunFill
                   onClick={() => handleToggleChangeTheme(status)}
                   className="text-secondary"
@@ -50,25 +54,20 @@ function Navbar() {
               </button>
             </li>
             <li>
-              <input
-                type="text"
-                className="border-2 
-                border-dark-subtle 
-                p-1 
-                rounded
-                text-xl
-                bg-transparent
-                outline-none
-                focus:border-white
-                transition
-                text-white
-                "
-                placeholder="search...."
+              <AppSearchForm
+                placeholder="Search"
+                inputClassName="border-dark-subtle text-white focus:border-white sm:w-auto w-40"
+                onSubmit={handleSearchSubmit}
               />
             </li>
             <li className="text-white font-semibold text-lg">
               {user.isLogin ? (
-                <button onClick={handleLogout} className="text-white font-semibold text-lg">Logout</button>
+                <button
+                  onClick={handleLogout}
+                  className="text-white font-semibold text-lg"
+                >
+                  Logout
+                </button>
               ) : (
                 <Link to="/auth/signin">Login</Link>
               )}

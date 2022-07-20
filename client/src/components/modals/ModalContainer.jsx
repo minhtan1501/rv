@@ -7,6 +7,7 @@ export default function ModalContainer({
   onClose,
 }) {
   const handleClick = (e) => {
+    e.stopPropagation();
     if (!onClose) return;
     if (e.target.id === 'modal-container') onClose && onClose();
   };

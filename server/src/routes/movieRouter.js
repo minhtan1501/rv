@@ -57,5 +57,6 @@ router.get('/latest-uploads',movieCtrl.getLatestUploads)
 router.get('/single/:movieId',movieCtrl.getSingleMovie)
 router.get('/related/:movieId',movieCtrl.getRelatedMovies)
 router.get('/top-rated',movieCtrl.getTopRatedMovies)
+router.get('/search-public', movieCtrl.searchPublicMovies)
 
 module.exports = router;

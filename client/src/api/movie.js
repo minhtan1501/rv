@@ -61,17 +61,17 @@ export const searchMovieForAdmin = (value, token) => {
   });
 };
 
-export const getTopRatedMovies = (type) => {
+export const getTopRatedMovies = (type,signal) => {
   let url = '/movie/top-rated';
   if(type) url = url + "?type=" + type
 
-  return axiosClient.get(url);
+  return axiosClient.get(url,{signal});
 };
 
-export const getLatestUploads = () => {
+export const getLatestUploads = (signal) => {
   const url = '/movie/latest-uploads';
 
-  return axiosClient.get(url);
+  return axiosClient.get(url,{signal});
 };
 
 export const getSingleMovie = (movieId) => {
@@ -79,3 +79,17 @@ export const getSingleMovie = (movieId) => {
   return axiosClient.get(url);
 
 }
+
+export const getRelatedMovies = (id) => {
+  const url = '/movie/related/'+id;
+
+  return axiosClient.get(url);
+};
+
+
+export const searchPublic = (title) => {
+  const url = '/movie/search-public?title='+title;
+
+  return axiosClient.get(url);
+};
+

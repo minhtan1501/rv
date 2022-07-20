@@ -67,11 +67,11 @@ export default function LatestUploads({ avatar }) {
 
   const fetchLatesUploads = async () => {
     try {
-      const { movies } = await getMovies(0, limit, token);
-      setMovies([...movies]);
+      // const { movies } = await getMovies(0, limit, token);
+      // setMovies([...movies]);
       dispatch(fetchLatestMovie({qty:5,token}));
     } catch (e) {
-      updateNotification('error', parseError(e));
+       updateNotification('error', parseError(e));
     }
   };
 
@@ -89,7 +89,7 @@ export default function LatestUploads({ avatar }) {
         className="
    bg-white shadow dark:shadow 
    dark:bg-secondary p-5 rounded
-   col-span-2"
+   col-span-2 "
       >
         <h1
           className="

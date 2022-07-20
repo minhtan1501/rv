@@ -33,3 +33,9 @@ export const deleteActor = (id, token) => {
     headers: {authorization: token },
   });
 };
+
+
+export const getActorProfile = (id) => {
+  const url = `/actor/single/${id}`;
+  return axiosClient.get(url);
+};

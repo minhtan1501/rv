@@ -1,5 +1,5 @@
 import { unwrapResult } from "@reduxjs/toolkit";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import NotFound from "./components/NotFound";
@@ -10,7 +10,9 @@ import Singup from "./feature/auth/Signup";
 import Singin from "./feature/auth/Singin";
 import Home from "./feature/home";
 import AdminNavigator from "./feature/navigator/AdminNavigator";
+import MovieReviews from "./feature/user/MovieReviews";
 import Navbar from "./feature/user/Navbar";
+import SearchMovies from "./feature/user/SearchMovies";
 import SingleMovie from "./feature/user/SingleMovie";
 import { getUserInfo, refreshToken } from "./redux/userSlide";
 function App() {
@@ -67,6 +69,8 @@ function App() {
     <Route path="/auth/forget-password" element={<ForgetPassword/>}/>
     <Route path="/auth/verification" element={<EmailVerification/>}/>
     <Route path="/movie/:movieId" element={<SingleMovie/>}/>
+    <Route path="/movie/reviews/:movieId" element={<MovieReviews/>}/>
+    <Route path="/movie/search" element={<SearchMovies/>}/>
     
     <Route path="/*" element={<NotFound/>}/>
     

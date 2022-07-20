@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BsBoxArrowUpRight, BsPencilSquare, BsTrash } from 'react-icons/bs';
 import { deleteMovie } from '../api/movie';
 import { useNotification } from '../hooks';
-import { parseError } from '../utils/helper';
+import { getPoster, parseError } from '../utils/helper';
 import ConfirmModal from './modals/ConfirmModal';
 import UpdateMovie from './modals/UpdateMovie';
 
@@ -77,7 +77,9 @@ export default function MovieListItem({
 }
 
 function MovieCard({ movie, onDeleteClick, onEditClick, onOpenClick }) {
-  const { poster, title, genres = [], status } = movie;
+  const { poster, title, genres = [], status,responsivePosters } = movie;
+  
+  
   return (
     <table
       className="
@@ -91,7 +93,7 @@ function MovieCard({ movie, onDeleteClick, onEditClick, onOpenClick }) {
                 className="
                   w-full aspect-video
                   "
-                src={poster}
+                src={getPoster(responsivePosters) || poster}
                 alt={title}
               />
             </div>
@@ -102,10 +104,10 @@ function MovieCard({ movie, onDeleteClick, onEditClick, onOpenClick }) {
               <h1
                 className="
                 text-lg
-              font-semibold
-              font-serif 
-            text-primary
-            dark:text-white"
+                font-semibold
+                font-serif 
+              text-primary
+              dark:text-white"
               >
                 {title}
               </h1>

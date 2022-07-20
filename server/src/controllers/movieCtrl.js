@@ -21,7 +21,6 @@ const movieCtrl = {
         file.path,
         { resource_type: "video" }
       );
-      console.log(public_id);
       res.json({ url, public_id });
     } catch (err) {}
   },
@@ -95,7 +94,12 @@ const movieCtrl = {
 
       await newMovie.save();
 
-      res.json({ id: newMovie._id });
+      res.json({
+        movie: {
+          id: newMovie._id,
+          title,
+        },
+      });
     } catch (err) {}
   },
   updateMovieWithoutPoster: async (req, res) => {
@@ -132,7 +136,6 @@ const movieCtrl = {
         }
         movie.writers = writers;
       }
-      console.log(movie);
       movie.title = title;
       movie.storyLine = storyLine;
       movie.tags = tags;
@@ -298,6 +301,7 @@ const movieCtrl = {
           poster: movie.poster?.url,
           genres: movie.genres,
           status: movie.status,
+          responsivePosters: movie.poster?.responsive,
         };
       });
 
@@ -371,6 +375,7 @@ const movieCtrl = {
         title: m.title,
         poster: m.poster?.url,
         trailer: m.trailer?.url,
+        responsivePosters: m.poster?.responsive,
         storyLine: m.storyLine,
       };
     });
@@ -378,7 +383,8 @@ const movieCtrl = {
   },
   getSingleMovie: async (req, res) => {
     const { movieId } = req.params;
-    if (!isValidObjectId(movieId)) return sendError(res, "Movie id is not valid!");
+    if (!isValidObjectId(movieId))
+      return sendError(res, "Movie id is not valid!");
     const movie = await Movie.findById(movieId).populate(
       "director writers cast.actor"
     );
@@ -444,7 +450,7 @@ const movieCtrl = {
       relatedMovieAggregation(movie.tags, movie._id)
     );
 
-    const relatedMovies = await Promise.all(
+    let relatedMovies = await Promise.all(
       movies.map(async (m) => {
         const reviews = await getAverageRatings(m._id);
 
@@ -452,10 +458,17 @@ const movieCtrl = {
           id: m._id,
           title: m.title,
           poster: m.poster,
+          responsivePosters: m.responsivePosters,
           reviews: { ...reviews },
         };
       })
     );
+
+    relatedMovies = relatedMovies.filter((m) => {
+      if (m.id === movieId) return null;
+      return m;
+    });
+
 
     res.status(200).json({ movies: relatedMovies });
   },
@@ -464,18 +477,43 @@ const movieCtrl = {
 
     const movies = await Movie.aggregate(topRatedMoviesPipeLine(type));
     const mapMovies = async (m) => {
-      const reviews =  await getAverageRatings(m._id)
+      const reviews = await getAverageRatings(m._id);
 
       return {
         id: m._id,
         title: m.title,
         poster: m.poster,
+        responsivePosters: m.responsivePosters,
         reviews: { ...reviews },
-      }
-    }
+      };
+    };
 
-    const topRatedMovies = await Promise.all(movies.map(mapMovies))
-    res.status(200).json({ movies: topRatedMovies })
+    const topRatedMovies = await Promise.all(movies.map(mapMovies));
+    res.status(200).json({ movies: topRatedMovies });
   },
+  searchPublicMovies: async (req, res) =>{
+    const { title } = req.query;
+    if (!title.trim()) return sendError(res, "Invalid request!");
+    const movies = await Movie.find({
+      title: { $regex: title, $options: "i" },
+      status: "public"
+    });
+
+    const mapMovies = async (m) => {
+      const reviews = await getAverageRatings(m._id);
+
+      return {
+        id: m._id,
+        title: m.title,
+        poster: m.poster?.url,
+        responsivePosters: m.poster?.responsive,
+        reviews: { ...reviews },
+      };
+    };
+
+    const results = await Promise.all(movies.map(mapMovies));
+
+    res.status(200).json({results});
+  }
 };
 module.exports = movieCtrl;
